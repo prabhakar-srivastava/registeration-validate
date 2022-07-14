@@ -4,6 +4,7 @@ const mysql = require("mysql");
 const cors = require('cors');
 const bodyparser = require("body-parser");
 const bcrypt = require('bcrypt');
+const { json } = require("body-parser");
 const saltround = 10;
 
 
@@ -37,45 +38,36 @@ app.use(bodyparser.urlencoded({ extended: true }));
 // });
 
 app.post("/api/insert", (req, res) => {
-
+ 
     const regName = req.body.regName;
-    console.log( regName);
+    console.log(regName);
     const regDate = req.body.regDate;
-    console.log(typeof(regDate));
-    console.log(regDate);
+    // console.log(typeof(regDate));
+    // console.log(regDate);
     const regEmail = req.body.regEmail;
-    console.log(typeof(regEmail));
-    console.log(regEmail);
+    // console.log(typeof(regEmail));
+    // console.log(regEmail);
     const regPassword = req.body.regPassword;
-    console.log(typeof(regEmail));
+    // console.log(regPassword);
+    // console.log(typeof(regPassword));
 
-    if(regPassword===""){
-        res.send({message:'fill all inputss'})
-    }else{
-        bcrypt.hash(regPassword, saltround, (err, hash) => {
-            if (err) {
-                console.log(err)
-            }
-            const query = 'INSERT INTO reg (name , date , email , password) VALUES (?,?,?,?);';
-    
-            db.query(query, [regName, regDate, regEmail, hash],
-                (err, result) => {
-                    if (err) {
-                        consple.log(err);
-                    }
-                    console.log(result);
+    bcrypt.hash(regPassword, saltround, (err, hash) => {
+        if (err) {
+            console.log(err)
+        }
+        const query = 'INSERT INTO reg (name , date , email , password) VALUES (?,?,?,?);';
+
+        db.query(query, [regName, regDate, regEmail, hash],
+            (err, result) => {
+                if (err) {
+                    // consple.log(err);
                 }
-    
-            );
-            res.send({message:"Successfully Register. please go back to login"})
-        });
+                console.log(result);
+            }
 
-    }
-    // if(regDate==''){
-    //     res.send({message:'plaese enter name'})
-        
-    // }
-    
+        );
+        res.send({ message: "Successfully Register. please go back to login" })
+    });    
     
 });
 
@@ -84,9 +76,9 @@ app.post("/api/Login", (req, res) => {
     console.log(username);
     const password = req.body.password;
     console.log(password);
-    if(username===''){
-        res.send({message:"fill all inputs"});
-    }else{
+    if (username === '') {
+        res.send({ message: "fill all inputs" });
+    } else {
 
         db.query(
             "SELECT * FROM reg WHERE name = ?;",
@@ -95,7 +87,7 @@ app.post("/api/Login", (req, res) => {
                 if (err) {
                     res.send({ err: err });
                 }
-                
+
                 //checkin user 
                 if (result.length > 0) {
                     bcrypt.compare(password, result[0].password, (error, response) => {
@@ -109,9 +101,9 @@ app.post("/api/Login", (req, res) => {
                 } else {
                     res.send({ message: "user doesn't exist" });
                 }
-    
-    
-        });
+
+
+            });
     }
 });
 
