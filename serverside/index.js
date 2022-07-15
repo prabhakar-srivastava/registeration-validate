@@ -17,7 +17,7 @@ const db = mysql.createConnection({
 db.connect(err => {
     // if(err) throw err
     if (!err) {
-        console.log("+ve")
+        console.log("db connected ")
 
     }
 });
@@ -28,17 +28,19 @@ app.use(bodyparser.urlencoded({ extended: true }));
 
 //test fetching
 
-// app.get('/api/get', (req, res) => {
-//     const qwe = "SELECT * FROM reg;";
-//     console.log(qwe);
-//     db.query(qwe, (err, result) => {
-//         console.log(result);
-//         res.send(result);
-//     });
-// });
+app.post('/api/user', (req, res) => {
+    const email = req.body.reg
+    console.log(email)
+    const qwe = "SELECT * FROM `reg` WHERE email='?';";
+    // console.log(qwe);
+    db.query(qwe,email ,(err, result) => {
+        console.log(result);
+        res.send(result);
+    });
+});
 
 app.post("/api/insert", (req, res) => {
- 
+
     const regName = req.body.regName;
     console.log(regName);
     const regDate = req.body.regDate;
@@ -67,44 +69,40 @@ app.post("/api/insert", (req, res) => {
 
         );
         res.send({ message: "Successfully Register. please go back to login" })
-    });    
-    
+    });
+
 });
 
-app.post("/api/Login", (req, res) => {
+app.post("/api/Login",(req, res) => {
     const username = req.body.username;
-    console.log(username);
+    // console.log(username);
     const password = req.body.password;
-    console.log(password);
-    if (username === '') {
-        res.send({ message: "fill all inputs" });
-    } else {
+    // console.log(password);
+    db.query(
+        "SELECT * FROM reg WHERE email = ?;",
+        username,
+        (err, result) => {
+            if (err) {
+                res.send({ err: err });
+            }
 
-        db.query(
-            "SELECT * FROM reg WHERE name = ?;",
-            username,
-            (err, result) => {
-                if (err) {
-                    res.send({ err: err });
-                }
-
-                //checkin user 
-                if (result.length > 0) {
-                    bcrypt.compare(password, result[0].password, (error, response) => {
-                        if (response) {
-                            res.send(result);
-                            console.log(result);
-                        } else {
-                            res.send({ message: "Wrong username/password combination!" });
-                        }
-                    });
-                } else {
-                    res.send({ message: "user doesn't exist" });
-                }
+            //checkin user 
+            if (result.length > 0) {
+                bcrypt.compare(password, result[0].password, (_error, response) => {
+                    if (response) {
+                        res.send(result);
+                        console.log(result);
+                    } else {
+                        res.send({ message: "Wrong username/password combination!" });
+                    }
+                });
+            } else {
+                res.send({ message: "user doesn't exist" });
+            }
 
 
-            });
-    }
+    });
+
 });
 
 
