@@ -31,9 +31,12 @@ app.use(bodyparser.urlencoded({ extended: true }));
 app.post('/api/user', (req, res) => {
     const email = req.body.reg
     console.log(email)
-    const qwe = "SELECT * FROM `reg` WHERE email='?';";
+    const qwe = "SELECT * FROM reg WHERE email=?;";
     // console.log(qwe);
     db.query(qwe,email ,(err, result) => {
+        if(err){
+            console.log("error : =>",err)
+        }
         console.log(result);
         res.send(result);
     });
