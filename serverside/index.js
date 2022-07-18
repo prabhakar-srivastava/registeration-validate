@@ -26,22 +26,63 @@ app.use(cors());
 app.use(express.json());
 app.use(bodyparser.urlencoded({ extended: true }));
 
-//test fetching
 
+
+// app.get('/api/editinfo', (req, res) => {
+//     const regInfo = req.body.regInfo;
+//     console.log(regInfo);
+//     db.query(qury, regInfo, (err, result) => {
+    //         if (err) {
+        //             console.log("error : =>", err)
+        //         }
+        
+        //          console.log(result);
+        //         res.send(result);
+        //     });
+        // });
+        
+        //test fetching
+        
 app.post('/api/user', (req, res) => {
     const email = req.body.reg
     console.log(email)
     const qwe = "SELECT * FROM reg WHERE email=?;";
     // console.log(qwe);
-    db.query(qwe,email ,(err, result) => {
-        if(err){
-            console.log("error : =>",err)
+    db.query(qwe, email, (err, result) => {
+        if (err) {
+            console.log("error : =>", err)
         }
         console.log(result);
         res.send(result);
     });
 });
 
+app.post("/api/update", (req, res) => {
+    
+    const upName = req.body.upName;
+    // console.log(upName);
+    const upBio = req.body.upBio;
+    const upPassword = req.body.upPassword;
+    const upEmail = req.body.upEmail;
+    
+    bcrypt.hash(upPassword, saltround, (err, hash) => {
+        if (err) {
+            console.log(err)
+        }
+        const query = 'UPDATE reg SET name=? , bio=? , password=? WHERE email=?';
+        
+        db.query(query, [upName, upBio, hash, upEmail],
+              (err, result) => {
+                  if (err) {
+                      console.log("error =>",err);
+                    }
+                    // res.send(result)
+                }
+                );
+    res.send({ message: "Successfully updates. please go back" })
+               
+    });
+});
 app.post("/api/insert", (req, res) => {
 
     const regName = req.body.regName;
@@ -76,7 +117,7 @@ app.post("/api/insert", (req, res) => {
 
 });
 
-app.post("/api/Login",(req, res) => {
+app.post("/api/Login", (req, res) => {
     const username = req.body.username;
     // console.log(username);
     const password = req.body.password;
@@ -104,7 +145,7 @@ app.post("/api/Login",(req, res) => {
             }
 
 
-    });
+        });
 
 });
 
